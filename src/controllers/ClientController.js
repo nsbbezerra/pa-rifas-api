@@ -1,5 +1,5 @@
-const knex = require("../database/index");
-const uniqid = require("uniqid");
+const knex = require('../database/index');
+const {v4: uuidv4} = require('uuid');
 
 module.exports = {
   async Store(req, res) {
@@ -19,17 +19,17 @@ module.exports = {
 
     try {
       const find = await knex
-        .select("cpf")
-        .from("clients")
-        .where({ cpf })
+        .select('cpf')
+        .from('clients')
+        .where({cpf})
         .first();
 
       if (find) {
-        return res.status(400).json({ message: "Este CPF já foi cadastrado" });
+        return res.status(400).json({message: 'Este CPF já foi cadastrado'});
       }
 
-      await knex("clients").insert({
-        identify: uniqid("cliente-"),
+      await knex('clients').insert({
+        identify: uuidv4(),
         name,
         cpf,
         phone,
@@ -43,12 +43,12 @@ module.exports = {
         state,
       });
 
-      return res.status(201).json({ message: "Cadastro efetuado com sucesso" });
+      return res.status(201).json({message: 'Cadastro efetuado com sucesso'});
     } catch (error) {
       let erros = {
-        status: "400",
-        type: "Erro no cadastro",
-        message: "Ocorreu um erro ao cadastrar o cliente",
+        status: '400',
+        type: 'Erro no cadastro',
+        message: 'Ocorreu um erro ao cadastrar o cliente',
         err: error.message,
       };
       return res.status(400).json(erros);
@@ -56,7 +56,7 @@ module.exports = {
   },
 
   async Update(req, res) {
-    const { id } = req.params;
+    const {id} = req.params;
     const {
       name,
       cpf,
@@ -71,8 +71,8 @@ module.exports = {
       state,
     } = req.body;
     try {
-      const client = await knex("clients")
-        .where({ identify: id })
+      const client = await knex('clients')
+        .where({identify: id})
         .update({
           name,
           cpf,
@@ -86,16 +86,16 @@ module.exports = {
           city,
           state,
         })
-        .returning("*");
+        .returning('*');
 
       return res
         .status(201)
-        .json({ message: "Alteração concluída com sucesso", client });
+        .json({message: 'Alteração concluída com sucesso', client});
     } catch (error) {
       let erros = {
-        status: "400",
-        type: "Erro no cadastro",
-        message: "Ocorreu um erro ao cadastrar o cliente",
+        status: '400',
+        type: 'Erro no cadastro',
+        message: 'Ocorreu um erro ao cadastrar o cliente',
         err: error.message,
       };
       return res.status(400).json(erros);
@@ -103,22 +103,22 @@ module.exports = {
   },
 
   async Login(req, res) {
-    const { cpf } = req.body;
+    const {cpf} = req.body;
     try {
       const client = await knex
-        .select("*")
-        .from("clients")
-        .where({ cpf })
+        .select('*')
+        .from('clients')
+        .where({cpf})
         .first();
       if (!client) {
-        return res.status(400).json({ message: "Cliente não encontrado" });
+        return res.status(400).json({message: 'Cliente não encontrado'});
       }
       return res.status(200).json(client);
     } catch (error) {
       let erros = {
-        status: "400",
-        type: "Erro no login",
-        message: "Ocorreu um erro ao fazer o login",
+        status: '400',
+        type: 'Erro no login',
+        message: 'Ocorreu um erro ao fazer o login',
         err: error.message,
       };
       return res.status(400).json(erros);
@@ -126,16 +126,18 @@ module.exports = {
   },
 
   async SetBannAdmin(req, res) {
-    const { id } = req.params;
-    const { active_admin } = req.body;
+    const {id} = req.params;
+    const {active_admin} = req.body;
     try {
-      await knex("clients").where({ id: id }).update({ active_admin });
-      return res.status(201).json({ message: "Alteração concluída com êxito" });
+      await knex('clients')
+        .where({id: id})
+        .update({active_admin});
+      return res.status(201).json({message: 'Alteração concluída com êxito'});
     } catch (error) {
       let erros = {
-        status: "400",
-        type: "Erro no login",
-        message: "Ocorreu um erro alterar a informação",
+        status: '400',
+        type: 'Erro no login',
+        message: 'Ocorreu um erro alterar a informação',
         err: error.message,
       };
       return res.status(400).json(erros);
@@ -143,16 +145,18 @@ module.exports = {
   },
 
   async SetBannClient(req, res) {
-    const { id } = req.params;
-    const { active_client } = req.body;
+    const {id} = req.params;
+    const {active_client} = req.body;
     try {
-      await knex("clients").where({ id: id }).update({ active_client });
-      return res.status(201).json({ message: "Alteração concluída com êxito" });
+      await knex('clients')
+        .where({id: id})
+        .update({active_client});
+      return res.status(201).json({message: 'Alteração concluída com êxito'});
     } catch (error) {
       let erros = {
-        status: "400",
-        type: "Erro no login",
-        message: "Ocorreu um erro alterar a informação",
+        status: '400',
+        type: 'Erro no login',
+        message: 'Ocorreu um erro alterar a informação',
         err: error.message,
       };
       return res.status(400).json(erros);
@@ -161,13 +165,16 @@ module.exports = {
 
   async Show(req, res) {
     try {
-      const clients = await knex.select("*").from("clients").orderBy("name");
+      const clients = await knex
+        .select('*')
+        .from('clients')
+        .orderBy('name');
       return res.status(200).json(clients);
     } catch (error) {
       let erros = {
-        status: "400",
-        type: "Erro no login",
-        message: "Ocorreu um erro buscar as informações",
+        status: '400',
+        type: 'Erro no login',
+        message: 'Ocorreu um erro buscar as informações',
         err: error.message,
       };
       return res.status(400).json(erros);

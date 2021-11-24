@@ -21,6 +21,11 @@ exports.up = function(knex) {
       .enu('status', ['open', 'cancel', 'drawn', 'waiting', 'refused'])
       .notNullable()
       .defaultTo('waiting');
+    table
+      .enu('money', ['lock', 'unlock'])
+      .notNullable()
+      .defaultTo('lock');
+    table.enu('payment', ['pix', 'card', 'all']).notNullable();
     table.string('thumbnail');
     table.string('transaction_id');
     table.timestamp('created_at').defaultTo(knex.fn.now());

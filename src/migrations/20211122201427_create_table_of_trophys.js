@@ -8,7 +8,15 @@ exports.up = function(knex) {
       .onDelete('CASCADE');
     table.string('title');
     table.string('description');
-    table.json('owner');
+    table.string('number');
+    table.string('name_client');
+    table.string('id_client');
+    table.json('address');
+    table
+      .enu('status', ['waiting', 'drawn'])
+      .notNullable()
+      .defaultTo('waiting');
+
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());
   });
