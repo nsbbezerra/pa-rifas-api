@@ -13,6 +13,8 @@ module.exports = {
       client_id,
       description,
       raffle_value,
+      payment,
+      trophys,
     } = req.body;
     const {filename} = req.file;
     try {
@@ -27,10 +29,24 @@ module.exports = {
           description,
           thumbnail: filename,
           raffle_value,
+          payment,
         })
         .returning('id');
+      const trophysParse = JSON.parse(trophys);
+      async function saveTrophys(trophy) {
+        await knex('trophys').insert({
+          raffle_id: id,
+          title: trophy.order,
+          description: trophy.desc,
+        });
+      }
+      if (trophysParse.length !== 0) {
+        trophysParse.forEach(element => {
+          saveTrophys(element);
+        });
+      }
       return res.status(201).json({
-        message: 'Sorteio cadastrado com sucesso, aguarde a liberação',
+        message: 'Rifa cadastrada com sucesso.',
         id,
       });
     } catch (error) {
@@ -143,6 +159,48 @@ module.exports = {
     }
   },
 
+  async FindById(req, res) {
+    const {id} = req.params;
+    try {
+      const raffles = await knex
+        .select([
+          'raffles.id',
+          'raffles.name',
+          'raffles.identify',
+          'raffles.qtd_numbers',
+          'raffles.draw_date',
+          'raffles.raffle_value',
+          'raffles.description',
+          'raffles.justify',
+          'raffles.status',
+          'raffles.thumbnail',
+          'clients.id as id_client',
+          'clients.name as name_client',
+          'clients.cpf as cpf_client',
+          'clients.city as client_city',
+          'clients.state as client_state',
+        ])
+        .from('raffles')
+        .where('raffles.identify', id)
+        .innerJoin('clients', 'clients.id', 'raffles.client_id')
+        .orderBy('raffles.updated_at', 'desc');
+      const trophys = await knex
+        .select('*')
+        .from('trophys')
+        .where({raffle_id: raffles[0].id});
+      const raffle = raffles[0];
+      return res.status(200).json({raffle, trophys});
+    } catch (error) {
+      let erros = {
+        status: '400',
+        type: 'Erro no cadastro',
+        message: 'Ocorreu um erro ao buscar as informações',
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
   async Find(req, res) {
     try {
       const raffles = await knex
@@ -187,13 +245,9 @@ module.exports = {
           'raffles.qtd_numbers',
           'raffles.draw_date',
           'raffles.raffle_value',
-          'raffles.pix_keys',
-          'raffles.bank_transfer',
           'raffles.description',
           'raffles.justify',
-          'raffles.refused',
           'raffles.status',
-          'raffles.number_drawn',
           'raffles.thumbnail',
           'clients.id as id_client',
           'clients.name as name_client',
@@ -203,8 +257,14 @@ module.exports = {
         .whereNotIn('status', ['refused', 'waiting'])
         .innerJoin('clients', 'clients.id', 'raffles.client_id')
         .orderBy('raffles.updated_at', 'desc');
-      const url = `${config.url}`;
-      return res.status(200).json({raffles, url});
+      const totalNumbers = await knex('numbers').where({
+        status: 'paid_out',
+      });
+      let numbersRaffle = raffles.map(element => {
+        const result = totalNumbers.filter(obj => obj.raffle_id === element.id);
+        return {raffle_id: element.id, count: result.length};
+      });
+      return res.status(200).json({raffles, numbers: numbersRaffle});
     } catch (error) {
       let erros = {
         status: '400',

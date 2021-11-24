@@ -15,7 +15,7 @@ exports.up = function(knex) {
       .notNullable()
       .onDelete('CASCADE');
     table.decimal('raffle_value', 8, 2);
-    table.string('description').notNullable();
+    table.text('description').notNullable();
     table.string('justify');
     table
       .enu('status', ['open', 'cancel', 'drawn', 'waiting', 'refused'])

@@ -32,7 +32,14 @@ module.exports = {
         .where('status', 'open')
         .innerJoin('clients', 'clients.id', 'raffles.client_id')
         .orderBy('raffles.updated_at', 'desc');
-      return res.status(200).json({configs, raffles, url, numbers});
+      let numbersRaffle = raffles.map(element => {
+        const result = numbers.filter(obj => obj.raffle_id === element.id);
+        return {raffle_id: element.id, count: result.length};
+      });
+
+      return res
+        .status(200)
+        .json({configs, raffles, url, numbers, numbersRaffle});
     } catch (error) {
       let erros = {
         status: '400',

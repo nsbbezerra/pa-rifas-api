@@ -47,6 +47,7 @@ router.get('/showRaffles', RaffleController.ShowRaffles);
 router.put('/updateDate/:id', RaffleController.ChangeDate);
 router.put('/blockRaffle/:id', RaffleController.Cancel);
 router.put('/drawn/:id', RaffleController.Drawn);
+router.get('/findRaffleById/:id', RaffleController.FindById);
 
 /** NUMEROS */
 router.post('/numbers', NumbersController.Buy);
