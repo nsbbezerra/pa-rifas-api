@@ -1,5 +1,9 @@
-const port = process.env.PORT || 3333;
+const token = process.env.MP_ACCESS_TOKEN_TEST;
+const url = "http://localhost:4000";
 module.exports = {
-  secret: "pwmrifasonline",
-  url: `https://server.rifapmw.com.br/img`,
+  secret: "parifasonline",
+  urlImg: `${url}/img`,
+  url: url,
+  payment_url: "https://api.mercadopago.com",
+  payment_token: token,
 };
