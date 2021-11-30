@@ -69,6 +69,6 @@ router.put("/raffleEditInfo/:id", RaffleEditController.UpdateInfo);
 router.delete("/raffleDelete/:id", RaffleEditController.RemoveRaffle);
 
 /** PAYMENTS */
-router.post("/rafflepayment", PaymentsController.PayRaffle);
+router.post("/rafflepayment/:id", PaymentsController.PayRaffle);
 
 module.exports = router;

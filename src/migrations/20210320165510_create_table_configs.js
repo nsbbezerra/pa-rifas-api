@@ -4,6 +4,8 @@ exports.up = function (knex) {
     table.string("admin_phone");
     table.integer("max_numbers");
     table.decimal("raffle_value", 8, 2);
+    table.decimal("pix_taxes", 8, 2);
+    table.decimal("card_taxes", 8, 2);
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("updated_at").defaultTo(knex.fn.now());
   });
