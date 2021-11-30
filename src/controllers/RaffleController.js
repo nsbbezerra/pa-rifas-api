@@ -2,8 +2,6 @@ const knex = require("../database/index");
 const config = require("../configs/index");
 const { isBefore } = require("date-fns");
 const { v4: uuidv4 } = require("uuid");
-const mercadopago = require("mercadopago");
-mercadopago.configure({ access_token: config.payment_token });
 
 module.exports = {
   async Store(req, res) {
@@ -19,13 +17,7 @@ module.exports = {
     } = req.body;
     const { filename } = req.file;
     try {
-      const default_configs = await knex.select("*").from("configs").first();
-      const find_client = await knex
-        .select("*")
-        .from("clients")
-        .where({ id: client_id })
-        .first();
-      const [id, identify] = await knex("raffles")
+      const [id] = await knex("raffles")
         .insert({
           identify: uuidv4(),
           name,
@@ -39,44 +31,6 @@ module.exports = {
           payment: "all",
         })
         .returning("id");
-      const preferences = {
-        notification_url:
-          "https://webhook.site/640dcefb-f748-4993-8534-9a67ebecb0be", //alterar para a url de notificação de pagamento de criação de rifas
-        items: [
-          {
-            title: `PA Rifas - Criação de Rifas: ${name}`,
-            id: identify,
-            currency_id: "BRL",
-            picture_url:
-              "https://www.mercadopago.com/org-img/MP3/home/logomp3.gif", //alterar para a url da thumbnail
-            description: `PA Rifas - Criação de Rifas: ${name}`,
-            quantity: 1,
-            unit_price: parseFloat(default_configs.raffle_value),
-          },
-        ],
-        payer: {
-          name: find_client.name,
-          email: find_client.email,
-          identification: {
-            type: "CPF",
-            number: find_client.cpf,
-          },
-        },
-        back_urls: {
-          success: "https://www.success.com", //Redirecionar para a home do site
-          failure: "http://www.failure.com", //Redirecionar para a criação de rifas
-          pending: "http://www.pending.com", //Redirecionar para a home do site
-        },
-        payment_methods: {
-          excluded_payment_types: [
-            {
-              id: "ticket",
-            },
-          ],
-          installments: 1,
-        },
-      };
-      console.log("IDENTIFY", identify);
       const trophysParse = JSON.parse(trophys);
       async function saveTrophys(trophy) {
         await knex("trophys").insert({
@@ -91,26 +45,9 @@ module.exports = {
         });
       }
 
-      mercadopago.preferences
-        .create(preferences)
-        .then((data) => {
-          const { response } = data;
-          console.log("RESPONSE CREATE", response);
-          const redirect_url = response.sandbox_init_point; //Em produção usar o init_point
-          return res.status(201).json({
-            message: "Rifa cadastrada com sucesso.",
-            redirect_url,
-          });
-        })
-        .catch((error) => {
-          let erros = {
-            status: "400",
-            type: "Erro no cadastro",
-            message: "Ocorreu um erro ao cadastrar o sorteio",
-            err: "Payment error",
-          };
-          return res.status(400).json(erros);
-        });
+      return res.status(201).json({
+        message: "Rifa cadastrada com sucesso.",
+      });
     } catch (error) {
       let erros = {
         status: "400",
