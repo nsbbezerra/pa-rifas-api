@@ -1,7 +1,7 @@
 exports.up = function (knex) {
-  return knex.schema.createTable("coupons", function (table) {
+  return knex.schema.createTable("coupon", function (table) {
     table.increments("id");
-    table.string("raffle_identify");
+    table.string("raffle");
     table.string("coupon_hash");
     table.decimal("coupon_value", 8, 2);
     table.enu("status", ["open", "used"]).notNullable().defaultTo("open");
@@ -11,4 +11,6 @@ exports.up = function (knex) {
   });
 };
 
-exports.down = function (knex) {};
+exports.down = function (knex) {
+  return knex.schema.dropTable("coupon");
+};
