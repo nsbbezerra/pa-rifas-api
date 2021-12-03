@@ -1,6 +1,7 @@
 exports.up = function (knex) {
   return knex.schema.createTable("coupon", function (table) {
     table.increments("id");
+    table.string("identify");
     table.string("raffle");
     table.string("coupon_hash");
     table.decimal("coupon_value", 8, 2);

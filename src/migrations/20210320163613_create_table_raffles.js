@@ -13,16 +13,16 @@ exports.up = function (knex) {
       .onDelete("CASCADE");
     table.decimal("raffle_value", 8, 2);
     table.text("description").notNullable();
-    table.string("justify");
+    table.text("justify");
+    table.text("change_justify");
     table
       .enu("status", ["open", "cancel", "drawn", "waiting", "refused"])
       .notNullable()
       .defaultTo("waiting");
     table.enu("money", ["lock", "unlock"]).notNullable().defaultTo("lock");
-    table.enu("payment", ["pix", "card", "all"]).notNullable();
     table.decimal("tax_value", 8, 2);
     table.string("thumbnail");
-    table.string("transaction_id");
+    table.string("coupon_identify");
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("updated_at").defaultTo(knex.fn.now());
   });

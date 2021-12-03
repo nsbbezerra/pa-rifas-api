@@ -28,7 +28,6 @@ module.exports = {
           description,
           thumbnail: filename,
           raffle_value,
-          payment: "all",
         })
         .returning("id");
       const trophysParse = JSON.parse(trophys);
