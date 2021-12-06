@@ -6,6 +6,7 @@ exports.up = function (knex) {
     table.integer("qtd_numbers").notNullable();
     table.string("draw_date").notNullable();
     table.string("draw_time").notNullable();
+    table.integer("goal");
     table
       .integer("client_id")
       .references("clients.id")

@@ -20,6 +20,7 @@ module.exports = {
           "raffles.justify",
           "raffles.status",
           "raffles.thumbnail",
+          "raffles.goal",
           "clients.id as id_client",
           "clients.name as name_client",
         ])

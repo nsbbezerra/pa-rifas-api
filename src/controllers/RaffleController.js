@@ -14,6 +14,7 @@ module.exports = {
       description,
       raffle_value,
       trophys,
+      goal,
     } = req.body;
     const { filename } = req.file;
     try {
@@ -28,6 +29,7 @@ module.exports = {
           description,
           thumbnail: filename,
           raffle_value,
+          goal,
         })
         .returning("id");
       const trophysParse = JSON.parse(trophys);
@@ -131,6 +133,7 @@ module.exports = {
           "raffles.justify",
           "raffles.status",
           "raffles.thumbnail",
+          "raffles.goal",
           "clients.id as id_client",
           "clients.name as name_client",
           "clients.phone as phone_client",
@@ -167,6 +170,7 @@ module.exports = {
           "raffles.justify",
           "raffles.status",
           "raffles.thumbnail",
+          "raffles.goal",
           "clients.id as id_client",
           "clients.name as name_client",
           "clients.cpf as cpf_client",
@@ -208,6 +212,7 @@ module.exports = {
           "raffles.justify",
           "raffles.status",
           "raffles.thumbnail",
+          "raffles.goal",
           "clients.id as id_client",
           "clients.name as name_client",
           "clients.cpf as cpf_client",
@@ -242,6 +247,7 @@ module.exports = {
           "raffles.justify",
           "raffles.status",
           "raffles.thumbnail",
+          "raffles.goal",
           "clients.id as id_client",
           "clients.name as name_client",
           "clients.phone as phone_client",
@@ -289,6 +295,7 @@ module.exports = {
           "raffles.status",
           "raffles.number_drawn",
           "raffles.thumbnail",
+          "raffles.goal",
           "clients.id as id_client",
           "clients.name as name_client",
           "clients.cpf as cpf_client",
