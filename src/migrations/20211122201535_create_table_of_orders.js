@@ -15,7 +15,7 @@ exports.up = function (knex) {
       .enu("status", ["free", "reserved", "paid_out"])
       .notNullable()
       .defaultTo("reserved");
-    table.enu("pay_mode", ["pix", "card"]).notNullable().defaultTo("reserved");
+    table.enu("pay_mode", ["pix", "card"]);
     table.json("numbers");
     table.string("transaction_id");
     table.decimal("tax", 8, 2);

@@ -1,18 +1,31 @@
 const knex = require("../database/index");
 const date_fns = require("date-fns");
+const mercadopago = require("mercadopago");
+const configs = require("../configs/index");
+
+mercadopago.configure({
+  access_token: configs.payment_token,
+});
 
 module.exports = {
   async Buy(req, res) {
-    const { raffle_id, client_id, numbers } = req.body;
+    const { raffle_id, client_id, numbers, orderValue } = req.body;
     const expiration = date_fns.addHours(new Date(), 24);
+
     try {
+      let arrayNumbers = [];
       async function SaveNumber(num) {
-        await knex("numbers").insert({
-          raffle_id,
-          client_id,
-          expiration_date: expiration,
-          number: num,
-        });
+        const [id] = await knex("numbers")
+          .insert({
+            raffle_id,
+            client_id,
+            expiration_date: expiration,
+            number: num,
+            status_drawn: "open",
+          })
+          .returning("*");
+        let info = { id: id.id, number: num };
+        await arrayNumbers.push(info);
       }
       await numbers.forEach((element) => {
         SaveNumber(parseInt(element));
@@ -28,10 +41,65 @@ module.exports = {
           client_id: client_id,
         });
       }
-      return res.status(201).json({
-        message:
-          "Números reservados com sucesso, entre em contado com o administrador para a liberação.",
-      });
+
+      const [order] = await knex("orders")
+        .insert({
+          raffle_id: raffle_id,
+          client_id: client_id,
+          status: "reserved",
+          pay_mode: "pix", // não será obrigatório remover depois
+          numbers: JSON.stringify(arrayNumbers),
+          expiration_date: expiration,
+          value: orderValue,
+        })
+        .returning("*");
+
+      let preference = {
+        external_reference: order.id.toString(), //mudar pra url de confirmação de pagamento
+        items: [
+          {
+            title: `Compra de números PA Rifas, Rifa número: ${raffle_id}`,
+            unit_price: parseFloat(orderValue),
+            quantity: 1,
+          },
+        ],
+        back_urls: {
+          success: "http://localhost:3000/finalizar",
+          failure: "http://localhost:3000/finalizar",
+          pending: "http://localhost:3000/finalizar",
+        },
+        auto_return: "approved",
+        payment_methods: {
+          excluded_payment_types: [
+            {
+              id: "ticket",
+            },
+            {
+              id: "paypal",
+            },
+          ],
+          installments: 1,
+        },
+      };
+
+      mercadopago.preferences
+        .create(preference)
+        .then((response) => {
+          const url = response.body.sandbox_init_point; //mudar em produção para init_point
+          return res.status(201).json({
+            message: "Números reservados com sucesso.",
+            url,
+          });
+        })
+        .catch((error) => {
+          let erros = {
+            status: "400",
+            type: "Erro no login",
+            message: "Ocorreu um erro ao reservar os números",
+            err: "Erro no pagamento",
+          };
+          return res.status(400).json(erros);
+        });
     } catch (error) {
       let erros = {
         status: "400",

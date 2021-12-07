@@ -8,4 +8,6 @@ module.exports = {
   site_url: site_url,
   payment_url: "https://api.mercadopago.com",
   payment_token: token,
+  pixTax: 0.99,
+  cardTax: 4.99,
 };

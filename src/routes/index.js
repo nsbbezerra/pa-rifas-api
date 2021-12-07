@@ -11,6 +11,7 @@ const NumbersController = require("../controllers/NumbersController");
 const MyDataController = require("../controllers/MyDataController");
 const RaffleEditController = require("../controllers/RaffleEditController");
 const PaymentsController = require("../controllers/PaymentController");
+const OrderController = require("../controllers/OrdersController");
 
 /** CLIENTES */
 router.post("/clients", ClientController.Store);
@@ -70,5 +71,8 @@ router.delete("/raffleDelete/:id", RaffleEditController.RemoveRaffle);
 
 /** PAYMENTS */
 router.post("/rafflepayment/:id", PaymentsController.PayRaffle);
+
+/** ORDERS */
+router.post("/payOrder/:order", OrderController.PayOrder);
 
 module.exports = router;

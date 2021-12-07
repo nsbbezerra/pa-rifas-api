@@ -185,8 +185,12 @@ module.exports = {
         .select("*")
         .from("trophys")
         .where({ raffle_id: raffles[0].id });
+      const numbers = await knex
+        .select("*")
+        .from("numbers")
+        .where({ raffle_id: raffles[0].id, status: "paid_out" });
       const raffle = raffles[0];
-      return res.status(200).json({ raffle, trophys });
+      return res.status(200).json({ raffle, trophys, numbers });
     } catch (error) {
       let erros = {
         status: "400",
