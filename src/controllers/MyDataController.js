@@ -35,15 +35,10 @@ module.exports = {
           "raffles.qtd_numbers",
           "raffles.draw_date",
           "raffles.raffle_value",
-          "raffles.pix_keys",
-          "raffles.bank_transfer",
           "raffles.description",
           "raffles.justify",
-          "raffles.refused",
           "raffles.status",
-          "raffles.number_drawn",
           "raffles.thumbnail",
-          "raffles.client_drawn",
           "clients.id as id_client",
           "clients.name as name_client",
           "clients.phone as phone_client",
@@ -54,6 +49,7 @@ module.exports = {
         .orderBy("raffles.updated_at");
       return res.status(200).json(raffles);
     } catch (error) {
+      console.log(error);
       let erros = {
         status: "400",
         type: "Erro no login",
@@ -81,15 +77,10 @@ module.exports = {
           "raffles.qtd_numbers",
           "raffles.draw_date",
           "raffles.raffle_value",
-          "raffles.pix_keys",
-          "raffles.bank_transfer",
           "raffles.description",
           "raffles.justify",
-          "raffles.refused",
           "raffles.status",
-          "raffles.number_drawn",
           "raffles.thumbnail",
-          "raffles.client_drawn",
           "clients.id as id_client",
           "clients.name as name_client",
           "clients.phone as phone_client",

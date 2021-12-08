@@ -2,6 +2,7 @@ const knex = require("../database/index");
 const date_fns = require("date-fns");
 const mercadopago = require("mercadopago");
 const configs = require("../configs/index");
+const { v4: uuidv4 } = require("uuid");
 
 mercadopago.configure({
   access_token: configs.payment_token,
@@ -13,19 +14,34 @@ module.exports = {
     const expiration = date_fns.addHours(new Date(), 24);
 
     try {
-      let arrayNumbers = [];
+      const client = await knex
+        .select("*")
+        .from("clients")
+        .where({ id: client_id })
+        .first();
+
+      const [order] = await knex("orders")
+        .insert({
+          identify: uuidv4(),
+          raffle_id: raffle_id,
+          client_id: client_id,
+          status: "reserved",
+          pay_mode: "pix", // não será obrigatório remover depois
+          expiration_date: expiration,
+          value: orderValue,
+        })
+        .returning("*");
+
       async function SaveNumber(num) {
-        const [id] = await knex("numbers")
-          .insert({
-            raffle_id,
-            client_id,
-            expiration_date: expiration,
-            number: num,
-            status_drawn: "open",
-          })
-          .returning("*");
-        let info = { id: id.id, number: num };
-        await arrayNumbers.push(info);
+        await knex("numbers").insert({
+          raffle_id,
+          client_id,
+          expiration_date: expiration,
+          number: num,
+          status_drawn: "open",
+          order_id: order.id,
+          status: "reserved",
+        });
       }
       await numbers.forEach((element) => {
         SaveNumber(parseInt(element));
@@ -42,20 +58,8 @@ module.exports = {
         });
       }
 
-      const [order] = await knex("orders")
-        .insert({
-          raffle_id: raffle_id,
-          client_id: client_id,
-          status: "reserved",
-          pay_mode: "pix", // não será obrigatório remover depois
-          numbers: JSON.stringify(arrayNumbers),
-          expiration_date: expiration,
-          value: orderValue,
-        })
-        .returning("*");
-
       let preference = {
-        external_reference: order.id.toString(), //mudar pra url de confirmação de pagamento
+        external_reference: order.identify,
         items: [
           {
             title: `Compra de números PA Rifas, Rifa número: ${raffle_id}`,
@@ -63,10 +67,14 @@ module.exports = {
             quantity: 1,
           },
         ],
+        payer: {
+          email: client.email,
+          first_name: client.name,
+        },
         back_urls: {
-          success: "http://localhost:3000/finalizar",
-          failure: "http://localhost:3000/finalizar",
-          pending: "http://localhost:3000/finalizar",
+          success: `${configs.site_url}/finalizar`,
+          failure: `${configs.site_url}/finalizar`,
+          pending: `${configs.site_url}/finalizar`,
         },
         auto_return: "approved",
         payment_methods: {
@@ -76,6 +84,9 @@ module.exports = {
             },
             {
               id: "paypal",
+            },
+            {
+              id: "debit_card",
             },
           ],
           installments: 1,
@@ -117,10 +128,11 @@ module.exports = {
       const raffle = await knex
         .select("*")
         .from("raffles")
-        .where({ identify: id });
+        .where({ identify: id })
+        .first();
       const validate = await knex
         .select("*")
-        .from("numbers")
+        .from("orders")
         .where({ raffle_id: raffle.id });
       async function revalidate(id) {
         await knex("numbers").where({ id: id }).update({ status: "free" });

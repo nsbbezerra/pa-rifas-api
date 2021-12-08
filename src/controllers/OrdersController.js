@@ -15,22 +15,23 @@ module.exports = {
       const orderAct = await knex
         .select("*")
         .from("orders")
-        .where({ id: parseInt(order) })
+        .where({ identify: order })
         .first();
 
-      async function sendActivate(id) {
-        await knex("numbers").where({ id: id }).update({ status: "paid_out" });
+      async function activateNumbers(id) {
+        await knex("numbers")
+          .where({ order_id: id })
+          .update({ status: "paid_out" });
       }
 
-      async function activateNumbers() {
-        await orderAct.numbers.forEach((element) => {
-          sendActivate(element.id);
-        });
+      async function delOrder(id) {
+        await knex("orders").where({ id: id }).del();
+        await knex("numbers").where({ order_id: id }).del();
       }
 
       async function updateOrder(tax, discounted, payment) {
         await knex("orders")
-          .where({ id: parseInt(order) })
+          .where({ identify: order })
           .update({
             pay_mode: payment,
             tax: tax,
@@ -38,7 +39,9 @@ module.exports = {
             status: status === "approved" ? "paid_out" : "reserved",
           });
         if (status === "approved") {
-          activateNumbers();
+          activateNumbers(orderAct.id);
+        } else {
+          delOrder(orderAct.id);
         }
       }
 

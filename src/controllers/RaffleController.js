@@ -329,12 +329,15 @@ module.exports = {
         .from("raffles")
         .where("identify", id)
         .first();
+
       const validate = await knex
         .select("*")
-        .from("numbers")
+        .from("orders")
         .where({ raffle_id: raffle.id });
+
       async function revalidate(id) {
-        await knex("numbers").where({ id: id }).del();
+        await knex("orders").where({ id: id }).del();
+        await knex("numbers").where({ order_id: id }).del();
       }
       await validate.forEach((element) => {
         if (isBefore(new Date(element.expiration_date), new Date())) {
@@ -358,7 +361,6 @@ module.exports = {
 
       return res.status(200).json({ numbers });
     } catch (error) {
-      console.log(error);
       let erros = {
         status: "400",
         type: "Erro no cadastro",

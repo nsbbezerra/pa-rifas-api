@@ -1,6 +1,7 @@
 exports.up = function (knex) {
   return knex.schema.createTable("orders", function (table) {
     table.increments("id");
+    table.string("identify");
     table
       .integer("raffle_id")
       .references("raffles.id")
@@ -16,7 +17,6 @@ exports.up = function (knex) {
       .notNullable()
       .defaultTo("reserved");
     table.enu("pay_mode", ["pix", "card"]);
-    table.json("numbers");
     table.string("transaction_id");
     table.decimal("tax", 8, 2);
     table.decimal("value", 8, 2);

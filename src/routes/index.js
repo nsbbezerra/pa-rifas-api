@@ -28,6 +28,7 @@ router.put("/configs/:id", ConfigsController.Update);
 
 /** SITE */
 router.get("/site", SiteController.Show);
+router.get("/raffleParticipant/:id", SiteController.RaffleParticipant);
 
 /** RAFFLES */
 router.post(
