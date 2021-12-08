@@ -29,6 +29,7 @@ router.put("/configs/:id", ConfigsController.Update);
 /** SITE */
 router.get("/site", SiteController.Show);
 router.get("/raffleParticipant/:id", SiteController.RaffleParticipant);
+router.get("/raffleAdmin/:id", SiteController.RaffleAdmin);
 
 /** RAFFLES */
 router.post(
@@ -49,7 +50,7 @@ router.put("/manAdmin/:id", RaffleController.ManageByAdmin);
 router.get("/showRaffles", RaffleController.ShowRaffles);
 router.put("/updateDate/:id", RaffleController.ChangeDate);
 router.put("/blockRaffle/:id", RaffleController.Cancel);
-router.put("/drawn/:id", RaffleController.Drawn);
+router.put("/drawn/:id/:trophy", RaffleController.Drawn);
 router.get("/findRaffleById/:id", RaffleController.FindById);
 
 /** NUMEROS */

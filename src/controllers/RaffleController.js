@@ -222,7 +222,6 @@ module.exports = {
           "clients.cpf as cpf_client",
         ])
         .from("raffles")
-        .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
         .orderBy("raffles.updated_at", "desc");
       return res.status(200).json(raffles);
@@ -483,31 +482,43 @@ module.exports = {
   },
 
   async Drawn(req, res) {
-    const { id } = req.params;
+    const { id, trophy } = req.params;
 
     try {
       const raffle = await knex
-        .select([
-          "numbers.id",
-          "numbers.number",
-          "clients.id as id_client",
-          "clients.name as name_client",
-          "clients.phone as phone_client",
-          "clients.email as email_client",
-        ])
+        .select("*")
         .from("numbers")
-        .where({ raffle_id: id, status: "paid_out" })
-        .innerJoin("clients", "clients.id", "numbers.client_id");
+        .where({ raffle_id: id, status: "paid_out" });
+
       const random = raffle[Math.floor(Math.random() * raffle.length)];
-      const newRaffle = await knex("raffles")
-        .where({ id: id })
+
+      const client = await knex("clients")
+        .where({ id: random.client_id })
+        .first();
+
+      await knex("trophys")
+        .where({ id: trophy })
         .update({
-          number_drawn: random.number,
-          client_drawn: JSON.stringify(random),
+          number: random.number,
+          name_client: JSON.stringify(client),
+          client_identify: raffle.identify_client,
           status: "drawn",
-        })
-        .returning("*");
-      return res.status(200).json({ random, newRaffle });
+        });
+
+      const findTrophys = await knex("trophys").where({
+        raffle_id: id,
+        status: "waiting",
+      });
+
+      if (!findTrophys.length) {
+        await knex("raffles").where({ id: id }).update({
+          status: "drawn",
+        });
+      }
+
+      const newTrophys = await knex("trophys").where({ raffle_id: id });
+
+      return res.status(200).json({ newTrophys });
     } catch (error) {
       console.log(error);
       let erros = {

@@ -67,4 +67,31 @@ module.exports = {
       return res.status(400).json(erros);
     }
   },
+
+  async RaffleAdmin(req, res) {
+    const { id } = req.params;
+
+    try {
+      const raffle = await knex("raffles").where({ identify: id }).first();
+      const trophys = await knex("trophys").where({ raffle_id: raffle.id });
+      const orders = await knex("orders").where({
+        raffle_id: raffle.id,
+        status: "paid_out",
+      });
+      const numbers = await knex("numbers").where({
+        raffle_id: raffle.id,
+        status: "paid_out",
+      });
+
+      return res.status(200).json({ raffle, trophys, orders, numbers });
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no cadastro",
+        message: "Ocorreu um erro ao buscar informações",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
 };
