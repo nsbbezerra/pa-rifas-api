@@ -12,6 +12,7 @@ const MyDataController = require("../controllers/MyDataController");
 const RaffleEditController = require("../controllers/RaffleEditController");
 const PaymentsController = require("../controllers/PaymentController");
 const OrderController = require("../controllers/OrdersController");
+const TrophyController = require("../controllers/TrophysController");
 
 /** CLIENTES */
 router.post("/clients", ClientController.Store);
@@ -50,7 +51,7 @@ router.put("/manAdmin/:id", RaffleController.ManageByAdmin);
 router.get("/showRaffles", RaffleController.ShowRaffles);
 router.put("/updateDate/:id", RaffleController.ChangeDate);
 router.put("/blockRaffle/:id", RaffleController.Cancel);
-router.put("/drawn/:id/:trophy", RaffleController.Drawn);
+router.put("/drawn/:id/:trophy/:number", RaffleController.Drawn);
 router.get("/findRaffleById/:id", RaffleController.FindById);
 
 /** NUMEROS */
@@ -76,5 +77,8 @@ router.post("/rafflepayment/:id", PaymentsController.PayRaffle);
 
 /** ORDERS */
 router.post("/payOrder/:order", OrderController.PayOrder);
+
+/** TROPHYS */
+router.get("/trophy/:id", TrophyController.Find);
 
 module.exports = router;

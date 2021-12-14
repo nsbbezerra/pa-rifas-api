@@ -30,6 +30,7 @@ module.exports = {
           thumbnail: filename,
           raffle_value,
           goal,
+          status: "open",
         })
         .returning("id");
       const trophysParse = JSON.parse(trophys);
@@ -482,28 +483,38 @@ module.exports = {
   },
 
   async Drawn(req, res) {
-    const { id, trophy } = req.params;
-
+    const { id, trophy, number } = req.params;
+    const numberInt = parseInt(number);
     try {
       const raffle = await knex
         .select("*")
         .from("numbers")
-        .where({ raffle_id: id, status: "paid_out" });
-
-      const random = raffle[Math.floor(Math.random() * raffle.length)];
-
-      const client = await knex("clients")
-        .where({ id: random.client_id })
+        .where({ raffle_id: id, status: "paid_out", number: numberInt })
         .first();
 
-      await knex("trophys")
+      if (!raffle) {
+        let erros = {
+          status: "400",
+          type: "Sorteio não Realizado",
+          message: "Número não encontrado, insira outro número",
+          err: "Número não encontrado",
+        };
+        return res.status(400).json(erros);
+      }
+
+      const client = await knex("clients")
+        .where({ id: raffle.client_id })
+        .first();
+
+      const [myTrophy] = await knex("trophys")
         .where({ id: trophy })
         .update({
-          number: random.number,
+          number: number,
           name_client: JSON.stringify(client),
-          client_identify: raffle.identify_client,
+          client_identify: client.identify,
           status: "drawn",
-        });
+        })
+        .returning("*");
 
       const findTrophys = await knex("trophys").where({
         raffle_id: id,
@@ -518,7 +529,7 @@ module.exports = {
 
       const newTrophys = await knex("trophys").where({ raffle_id: id });
 
-      return res.status(200).json({ newTrophys });
+      return res.status(200).json({ newTrophys, client, myTrophy });
     } catch (error) {
       console.log(error);
       let erros = {
