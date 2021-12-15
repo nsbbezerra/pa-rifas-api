@@ -13,6 +13,7 @@ const RaffleEditController = require("../controllers/RaffleEditController");
 const PaymentsController = require("../controllers/PaymentController");
 const OrderController = require("../controllers/OrdersController");
 const TrophyController = require("../controllers/TrophysController");
+const CouponController = require("../controllers/CouponController");
 
 /** CLIENTES */
 router.post("/clients", ClientController.Store);
@@ -80,5 +81,12 @@ router.post("/payOrder/:order", OrderController.PayOrder);
 
 /** TROPHYS */
 router.get("/trophy/:id", TrophyController.Find);
+
+/** COUPONS */
+router.post("/coupon", CouponController.Create);
+router.get("/coupon/:hash", CouponController.Find);
+
+/** WEBHOOKS PAY */
+router.post("/paymentOrder/:identify", PaymentsController.WebhookPay);
 
 module.exports = router;

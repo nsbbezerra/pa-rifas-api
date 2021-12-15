@@ -60,6 +60,8 @@ module.exports = {
 
       let preference = {
         external_reference: order.identify,
+        notification_url:
+          "https://webhook.site/c94327a0-a451-4715-a4fb-36ad16a8fc5c",
         items: [
           {
             title: `Compra de números PA Rifas, Rifa número: ${raffle_id}`,

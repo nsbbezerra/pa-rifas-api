@@ -15,6 +15,9 @@ module.exports = {
       raffle_value,
       trophys,
       goal,
+      tax_value,
+      isDiscounted,
+      coupon,
     } = req.body;
     const { filename } = req.file;
     try {
@@ -31,6 +34,7 @@ module.exports = {
           raffle_value,
           goal,
           status: "open",
+          tax_value,
         })
         .returning("id");
       const trophysParse = JSON.parse(trophys);
@@ -45,6 +49,15 @@ module.exports = {
         trophysParse.forEach((element) => {
           saveTrophys(element);
         });
+      }
+
+      if (isDiscounted === "yes") {
+        await knex("coupon")
+          .where({ identify: coupon })
+          .update({ status: "used" });
+        await knex("raffles")
+          .where({ id: id })
+          .update({ coupon_identify: coupon });
       }
 
       return res.status(201).json({
