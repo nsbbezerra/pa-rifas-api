@@ -1,4 +1,5 @@
 const knex = require("../database/index");
+const date_fns = require("date-fns");
 
 module.exports = {
   async Show(req, res) {
@@ -51,6 +52,20 @@ module.exports = {
     try {
       const raffle = await knex("raffles").where({ identify: id }).first();
       const trophys = await knex("trophys").where({ raffle_id: raffle.id });
+
+      const validate = await knex
+        .select("*")
+        .from("orders")
+        .where({ raffle_id: raffle.id });
+      async function revalidate(id) {
+        await knex("numbers").where({ id: id }).update({ status: "free" });
+      }
+      await validate.forEach((element) => {
+        if (date_fns.isAfter(new Date(element.expiration_date), new Date())) {
+          revalidate(element.id);
+        }
+      });
+
       const orders = await knex("orders").where({ raffle_id: raffle.id });
       const numbers = await knex("numbers").where({
         raffle_id: raffle.id,

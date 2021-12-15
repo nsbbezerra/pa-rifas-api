@@ -56,10 +56,21 @@ module.exports = {
             updateOrder(calc, rest, "card");
           }
 
+          if (payType === "debit_card") {
+            const calc = parseFloat(orderAct.value) * (configs.debitTax / 100);
+            const rest = parseFloat(orderAct.value) - calc;
+            updateOrder(calc, rest, "debit");
+          }
+
           if (payType === "pix") {
             const calc = parseFloat(orderAct.value) * (configs.pixTax / 100);
             const rest = parseFloat(orderAct.value) - calc;
             updateOrder(calc, rest, "pix");
+          }
+
+          if (payType === "ticket") {
+            const calc = parseFloat(orderAct.value) - configs.boleto;
+            updateOrder(configs.boleto, calc, "ticket");
           }
 
           return res.status(200).json({ message: "Pagamento ativado" });

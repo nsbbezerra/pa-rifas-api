@@ -11,7 +11,7 @@ mercadopago.configure({
 module.exports = {
   async Buy(req, res) {
     const { raffle_id, client_id, numbers, orderValue } = req.body;
-    const expiration = date_fns.addHours(new Date(), 24);
+    const expiration = date_fns.addHours(new Date(), 48);
 
     try {
       const client = await knex
@@ -58,10 +58,23 @@ module.exports = {
         });
       }
 
+      let excluded =
+        parseFloat(orderValue) < configs.minimum_payment
+          ? [
+              {
+                id: "paypal",
+              },
+              { id: "ticket" },
+            ]
+          : [
+              {
+                id: "paypal",
+              },
+            ];
+
       let preference = {
         external_reference: order.identify,
-        notification_url:
-          "https://webhook.site/c94327a0-a451-4715-a4fb-36ad16a8fc5c",
+        notification_url: "https://enudxbiyvnxozjv.m.pipedream.net", //`${configs.url}/paymentOrder/${order.identify}`,
         items: [
           {
             title: `Compra de números PA Rifas, Rifa número: ${raffle_id}`,
@@ -80,17 +93,7 @@ module.exports = {
         },
         auto_return: "approved",
         payment_methods: {
-          excluded_payment_types: [
-            {
-              id: "ticket",
-            },
-            {
-              id: "paypal",
-            },
-            {
-              id: "debit_card",
-            },
-          ],
+          excluded_payment_types: excluded,
           installments: 1,
         },
       };

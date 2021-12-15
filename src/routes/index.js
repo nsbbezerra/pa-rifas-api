@@ -85,6 +85,10 @@ router.get("/trophy/:id", TrophyController.Find);
 /** COUPONS */
 router.post("/coupon", CouponController.Create);
 router.get("/coupon/:hash", CouponController.Find);
+router.post("/couponRaffle", CouponController.StoreCouponRaffle);
+router.get("/couponRaffleHash/:hash", CouponController.FindRaffleCoupon);
+router.put("/couponRaffle/:id", CouponController.Active);
+router.get("/findCouponRaffle/:identify", CouponController.Show);
 
 /** WEBHOOKS PAY */
 router.post("/paymentOrder/:identify", PaymentsController.WebhookPay);

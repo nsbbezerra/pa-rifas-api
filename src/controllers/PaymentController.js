@@ -47,6 +47,11 @@ module.exports = {
   async WebhookPay(req, res) {
     const { data_id } = req.query;
     const { identify } = req.params;
+
+    console.log("BODY", req.body);
+    console.log("DATA ID", data_id);
+    console.log("IDENTIFY", identify);
+
     try {
       const order = await knex("orders").where({ identify: identify }).first();
       if (!order) {
@@ -55,12 +60,14 @@ module.exports = {
       async function saveStatusOrder(pay) {
         let valueTax;
         let valueDiscounted;
+        let typePayment;
 
         if (pay === "credit_card") {
           const calc = parseFloat(order.value) * (configs.cardTax / 100);
           const rest = parseFloat(order.value) - calc;
           valueTax = calc;
           valueDiscounted = rest;
+          typePayment = "card";
         }
 
         if (pay === "pix") {
@@ -68,17 +75,33 @@ module.exports = {
           const rest = parseFloat(order.value) - calc;
           valueTax = calc;
           valueDiscounted = rest;
+          typePayment = "pix";
         }
 
-        await knex("orders")
-          .where({ identify: identify })
-          .update({
-            transaction_id: data_id,
-            status: "paid_out",
-            discounted_value: valueDiscounted,
-            tax: valueTax,
-            pay_mode: pay === "pix" ? "pix" : "card",
-          });
+        if (payType === "debit_card") {
+          const calc = parseFloat(orderAct.value) * (configs.debitTax / 100);
+          const rest = parseFloat(orderAct.value) - calc;
+          valueTax = calc;
+          valueDiscounted = rest;
+          typePayment = "debit";
+        }
+
+        if (payType === "ticket") {
+          const calc = parseFloat(orderAct.value) - configs.boleto;
+          valueTax = configs.boleto;
+          valueDiscounted = calc;
+          typePayment = "ticket";
+        }
+
+        console.log("MODE PAYMENT", valueTax, valueDiscounted, typePayment);
+
+        await knex("orders").where({ identify: identify }).update({
+          transaction_id: data_id,
+          status: "paid_out",
+          discounted_value: valueDiscounted,
+          tax: valueTax,
+          pay_mode: typePayment,
+        });
         await knex("numbers")
           .where({ order_id: order.id })
           .update({ status: "paid_out" });
@@ -87,6 +110,7 @@ module.exports = {
         .findById(data_id)
         .then((data) => {
           const { response } = data;
+          console.log("FIND PAYMENT ID", response);
           const status = response.status;
           const payment_id = response.payment_method_id;
           if (status === "approved") {
@@ -95,6 +119,7 @@ module.exports = {
           return res.status(201).json({ message: "OK" });
         })
         .catch((err) => {
+          console.log("ERRO MP", err);
           let erros = {
             status: "400",
             type: "Erro no login",
@@ -104,6 +129,7 @@ module.exports = {
           return res.status(400).json(erros);
         });
     } catch (error) {
+      console.log("ERRO INTERNO", error);
       let erros = {
         status: "400",
         type: "Erro no pagamento",
