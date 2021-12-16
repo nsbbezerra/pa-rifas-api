@@ -11,7 +11,7 @@ mercadopago.configure({
 module.exports = {
   async Buy(req, res) {
     const { raffle_id, client_id, numbers, orderValue } = req.body;
-    const expiration = date_fns.addHours(new Date(), 48);
+    const expiration = date_fns.addHours(new Date(), 24);
 
     try {
       const client = await knex
@@ -58,20 +58,6 @@ module.exports = {
         });
       }
 
-      let excluded =
-        parseFloat(orderValue) < configs.minimum_payment
-          ? [
-              {
-                id: "paypal",
-              },
-              { id: "ticket" },
-            ]
-          : [
-              {
-                id: "paypal",
-              },
-            ];
-
       let preference = {
         external_reference: order.identify,
         notification_url: "https://enudxbiyvnxozjv.m.pipedream.net", //`${configs.url}/paymentOrder/${order.identify}`,
@@ -93,7 +79,12 @@ module.exports = {
         },
         auto_return: "approved",
         payment_methods: {
-          excluded_payment_types: excluded,
+          excluded_payment_types: [
+            {
+              id: "paypal",
+            },
+            { id: "ticket" },
+          ],
           installments: 1,
         },
       };
@@ -209,6 +200,83 @@ module.exports = {
         status: "400",
         type: "Erro no login",
         message: "Ocorreu um erro ao editar os números",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
+  async PayOrderById(req, res) {
+    const { order } = req.params;
+
+    try {
+      const orders = await knex
+        .select("*")
+        .from("orders")
+        .where({ id: order })
+        .first();
+
+      const client = await knex
+        .select("*")
+        .from("clients")
+        .where({ id: orders.client_id })
+        .first();
+
+      let preference = {
+        external_reference: orders.identify,
+        notification_url: "https://enudxbiyvnxozjv.m.pipedream.net", //`${configs.url}/paymentOrder/${order.identify}`,
+        items: [
+          {
+            title: `Compra de números PA Rifas, Rifa número: ${orders.raffle_id}`,
+            unit_price: parseFloat(orders.value),
+            quantity: 1,
+          },
+        ],
+        payer: {
+          email: client.email,
+          first_name: client.name,
+        },
+        back_urls: {
+          success: `${configs.site_url}/finalizar`,
+          failure: `${configs.site_url}/finalizar`,
+          pending: `${configs.site_url}/finalizar`,
+        },
+        auto_return: "approved",
+        payment_methods: {
+          excluded_payment_types: [
+            {
+              id: "paypal",
+            },
+            { id: "ticket" },
+          ],
+          installments: 1,
+        },
+      };
+
+      mercadopago.preferences
+        .create(preference)
+        .then((response) => {
+          const url = response.body.sandbox_init_point; //mudar em produção para init_point
+          return res.status(201).json({
+            message: "Números reservados com sucesso.",
+            url,
+          });
+        })
+        .catch((error) => {
+          let erros = {
+            status: "400",
+            type: "Erro no login",
+            message: "Ocorreu um erro ao reservar os números",
+            err: "Erro no pagamento",
+          };
+          return res.status(400).json(erros);
+        });
+    } catch (error) {
+      console.log(error);
+      let erros = {
+        status: "400",
+        type: "Erro no pagamento",
+        message: "Ocorreu um erro ao efetuar o pagamento",
         err: error.message,
       };
       return res.status(400).json(erros);

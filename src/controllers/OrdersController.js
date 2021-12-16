@@ -37,6 +37,7 @@ module.exports = {
             tax: tax,
             discounted_value: discounted,
             status: status === "approved" ? "paid_out" : "reserved",
+            transaction_id: payment_id,
           });
         if (status === "approved") {
           activateNumbers(orderAct.id);
