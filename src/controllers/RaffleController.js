@@ -270,7 +270,7 @@ module.exports = {
           "clients.phone as phone_client",
         ])
         .from("raffles")
-        .whereNotIn("status", ["refused", "waiting"])
+        .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
         .orderBy("raffles.updated_at", "desc");
       const totalNumbers = await knex("numbers").where({

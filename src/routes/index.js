@@ -14,6 +14,7 @@ const PaymentsController = require("../controllers/PaymentController");
 const OrderController = require("../controllers/OrdersController");
 const TrophyController = require("../controllers/TrophysController");
 const CouponController = require("../controllers/CouponController");
+const MessageController = require("../controllers/MessageController");
 
 /** CLIENTES */
 router.post("/clients", ClientController.Store);
@@ -93,5 +94,8 @@ router.get("/findCouponRaffle/:identify", CouponController.Show);
 
 /** WEBHOOKS PAY */
 router.post("/paymentOrder/:identify", PaymentsController.WebhookPay);
+
+/** MESSAGES */
+router.post("/message", MessageController.Store);
 
 module.exports = router;
