@@ -11,7 +11,7 @@ app.use(cors());
 app.use(routes);
 app.use("/img", express.static(path.resolve(__dirname, "..", "uploads")));
 
-const port = process.env.PORT || 3333;
+const port = process.env.PORT || 4000;
 
 app.listen(port, function () {
   InitController.Create();
