@@ -1,17 +1,17 @@
 // Update with your config settings.
-const path = require('path');
+const path = require("path");
 
 module.exports = {
   development: {
-    client: 'pg',
+    client: "pg",
     connection: {
-      database: 'parifas',
-      user: 'postgres',
-      password: '03102190',
+      database: "rifas",
+      user: "parifas",
+      password: "03102190",
     },
     migrations: {
-      tableName: 'knex_migrations',
-      directory: `${path.resolve(__dirname, 'src', 'migrations')}`,
+      tableName: "knex_migrations",
+      directory: `${path.resolve(__dirname, "src", "migrations")}`,
     },
   },
 };

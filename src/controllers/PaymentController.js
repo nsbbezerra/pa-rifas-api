@@ -45,15 +45,15 @@ module.exports = {
   },
 
   async WebhookPay(req, res) {
-    const { data_id } = req.query;
+    const { data } = req.body;
     const { identify } = req.params;
 
     console.log("BODY", req.body);
-    console.log("DATA ID", data_id);
+    console.log("DATA ID", data.id);
     console.log("IDENTIFY", identify);
 
     try {
-      if (data_id) {
+      if (data.id) {
         const order = await knex("orders")
           .where({ identify: identify })
           .first();
@@ -99,19 +99,18 @@ module.exports = {
           console.log("MODE PAYMENT", valueTax, valueDiscounted, typePayment);
 
           await knex("orders").where({ identify: identify }).update({
-            transaction_id: data_id,
+            transaction_id: data.id,
             status: "paid_out",
             discounted_value: valueDiscounted,
             tax: valueTax,
             pay_mode: typePayment,
-            transaction_id: data_id,
           });
           await knex("numbers")
             .where({ order_id: order.id })
             .update({ status: "paid_out" });
         }
         mercadopago.payment
-          .findById(data_id)
+          .findById(data.id)
           .then((data) => {
             const { response } = data;
             console.log("FIND PAYMENT ID", response);
