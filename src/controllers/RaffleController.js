@@ -535,6 +535,22 @@ module.exports = {
       });
 
       if (!findTrophys.length) {
+        const myRaffle = await knex("raffles").where({ id: id }).first();
+        const finishOrders = await knex("orders").where({
+          raffle_id: id,
+          status: "paid_out",
+        });
+        let soma = finishOrders.reduce(function (total, numero) {
+          return total + parseFloat(numero.discounted_value);
+        }, 0);
+        let calc = soma * (parseFloat(myRaffle.tax_value) / 100);
+        const date = new Date();
+        await knex("revenues").insert({
+          raffle_id: id,
+          value: calc,
+          month: date.toLocaleString("pt-br", { month: "long" }),
+          year: date.getFullYear().toString(),
+        });
         await knex("raffles").where({ id: id }).update({
           status: "drawn",
         });

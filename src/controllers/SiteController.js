@@ -93,12 +93,23 @@ module.exports = {
         raffle_id: raffle.id,
         status: "paid_out",
       });
-      const numbers = await knex("numbers").where({
-        raffle_id: raffle.id,
-        status: "paid_out",
-      });
-
-      return res.status(200).json({ raffle, trophys, orders, numbers });
+      const numbersPaid = await knex("numbers")
+        .where({
+          raffle_id: raffle.id,
+          status: "paid_out",
+        })
+        .count();
+      const numbersReserved = await knex("numbers")
+        .where({
+          raffle_id: raffle.id,
+          status: "reserved",
+        })
+        .count();
+      const reserved = numbersReserved[0].count;
+      const numbers = numbersPaid[0].count;
+      return res
+        .status(200)
+        .json({ raffle, trophys, orders, numbers, reserved });
     } catch (error) {
       let erros = {
         status: "400",
