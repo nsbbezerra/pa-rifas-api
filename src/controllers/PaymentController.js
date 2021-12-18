@@ -81,7 +81,7 @@ module.exports = {
             typePayment = "pix";
           }
 
-          if (payType === "debit_card") {
+          if (pay === "debit_card") {
             const calc = parseFloat(orderAct.value) * (configs.debitTax / 100);
             const rest = parseFloat(orderAct.value) - calc;
             valueTax = calc;
@@ -89,7 +89,7 @@ module.exports = {
             typePayment = "debit";
           }
 
-          if (payType === "ticket") {
+          if (pay === "ticket") {
             const calc = parseFloat(orderAct.value) - configs.boleto;
             valueTax = configs.boleto;
             valueDiscounted = calc;
@@ -115,7 +115,7 @@ module.exports = {
             const { response } = data;
             console.log("FIND PAYMENT ID", response);
             const status = response.status;
-            const payment_id = response.payment_method_id;
+            const payment_id = response.payment_type_id;
             if (status === "approved") {
               saveStatusOrder(payment_id);
             }

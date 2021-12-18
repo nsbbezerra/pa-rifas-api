@@ -60,7 +60,7 @@ module.exports = {
 
       let preference = {
         external_reference: order.identify,
-        notification_url: "https://enudxbiyvnxozjv.m.pipedream.net", //`${configs.url}/paymentOrder/${order.identify}`,
+        notification_url: `${configs.url}/paymentOrder/${order.identify}`,
         items: [
           {
             title: `Compra de números PA Rifas, Rifa número: ${raffle_id}`,
