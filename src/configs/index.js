@@ -1,9 +1,9 @@
 const tokens = require("./tokens.json");
 module.exports = {
   secret: "parifasonline",
-  urlImg: `${tokens.API}/img`,
-  url: tokens.API,
-  site_url: tokens.SITE,
+  urlImg: `${tokens.AMBIENT === "dev" ? tokens.API_DEV : tokens.API}/img`,
+  url: tokens.AMBIENT === "dev" ? tokens.API_DEV : tokens.API,
+  site_url: tokens.AMBIENT === "dev" ? tokens.SITE_DEV : tokens.SITE,
   payment_url: tokens.MP,
   payment_token: tokens.TEST,
   pixTax: 0.99,

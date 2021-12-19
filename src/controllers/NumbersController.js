@@ -3,6 +3,7 @@ const date_fns = require("date-fns");
 const mercadopago = require("mercadopago");
 const configs = require("../configs/index");
 const { v4: uuidv4 } = require("uuid");
+const tokens = require("../configs/tokens.json");
 
 mercadopago.configure({
   access_token: configs.payment_token,
@@ -60,7 +61,10 @@ module.exports = {
 
       let preference = {
         external_reference: order.identify,
-        notification_url: `${configs.url}/paymentOrder/${order.identify}`,
+        notification_url:
+          tokens.AMBIENT === "dev"
+            ? tokens.WEBHOOK
+            : `${configs.url}/paymentOrder/${order.identify}`,
         items: [
           {
             title: `Compra de números PA Rifas, Rifa número: ${raffle_id}`,
@@ -68,6 +72,7 @@ module.exports = {
             quantity: 1,
           },
         ],
+        statement_descriptor: `PA RIFAS, COMPRA Nº ${order.id}`,
         payer: {
           email: client.email,
           first_name: client.name,
@@ -79,13 +84,9 @@ module.exports = {
         },
         auto_return: "approved",
         payment_methods: {
-          excluded_payment_types: [
-            {
-              id: "paypal",
-            },
-            { id: "ticket" },
-          ],
+          excluded_payment_types: [{ id: "paypal" }, { id: "ticket" }],
           installments: 1,
+          s,
         },
       };
 
