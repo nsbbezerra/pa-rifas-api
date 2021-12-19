@@ -14,7 +14,7 @@ exports.up = function (knex) {
     table
       .enu("status", ["free", "reserved", "paid_out"])
       .notNullable()
-      .defaultTo("free");
+      .defaultTo("reserved");
     table.enu("status_drawn", ["open", "draw"]).notNullable().defaultTo("open");
     table.integer("number").notNullable();
     table.string("expiration_date").notNullable();
