@@ -48,9 +48,6 @@ module.exports = {
     const { data } = req.body;
     const { identify } = req.params;
 
-    console.log("BODY", req.body);
-    console.log("IDENTIFY", identify);
-
     try {
       if (data) {
         const order = await knex("orders")
@@ -95,8 +92,6 @@ module.exports = {
             typePayment = "ticket";
           }
 
-          console.log("MODE PAYMENT", valueTax, valueDiscounted, typePayment);
-
           await knex("orders").where({ identify: identify }).update({
             transaction_id: data.id,
             status: "paid_out",
@@ -112,7 +107,6 @@ module.exports = {
           .findById(data.id)
           .then((data) => {
             const { response } = data;
-            console.log("FIND PAYMENT ID", response);
             const status = response.status;
             const payment_id = response.payment_type_id;
             if (status === "approved") {
@@ -121,7 +115,6 @@ module.exports = {
             return res.status(201).json({ message: "OK" });
           })
           .catch((err) => {
-            console.log("ERRO MP", err);
             let erros = {
               status: "400",
               type: "Erro no login",
@@ -136,7 +129,6 @@ module.exports = {
           .json({ message: "ID de pagamento não presente" });
       }
     } catch (error) {
-      console.log("ERRO INTERNO", error);
       let erros = {
         status: "400",
         type: "Erro no pagamento",

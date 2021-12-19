@@ -224,7 +224,10 @@ module.exports = {
 
       let preference = {
         external_reference: orders.identify,
-        notification_url: "https://enudxbiyvnxozjv.m.pipedream.net", //`${configs.url}/paymentOrder/${order.identify}`,
+        notification_url:
+          tokens.AMBIENT === "dev"
+            ? tokens.WEBHOOK
+            : `${configs.url}/paymentOrder/${order.identify}`,
         items: [
           {
             title: `Compra de números PA Rifas, Rifa número: ${orders.raffle_id}`,
@@ -232,6 +235,7 @@ module.exports = {
             quantity: 1,
           },
         ],
+        statement_descriptor: `PA RIFAS, COMPRA Nº ${orders.id}`,
         payer: {
           email: client.email,
           first_name: client.name,
@@ -272,7 +276,6 @@ module.exports = {
           return res.status(400).json(erros);
         });
     } catch (error) {
-      console.log(error);
       let erros = {
         status: "400",
         type: "Erro no pagamento",
