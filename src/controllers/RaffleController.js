@@ -515,6 +515,16 @@ module.exports = {
         return res.status(400).json(erros);
       }
 
+      if (raffle.status === "reserved") {
+        let erros = {
+          status: "400",
+          type: "Sorteio não Realizado",
+          message: "Número não foi pago",
+          err: "Número não encontrado",
+        };
+        return res.status(400).json(erros);
+      }
+
       const client = await knex("clients")
         .where({ id: raffle.client_id })
         .first();
