@@ -49,11 +49,10 @@ module.exports = {
     const { identify } = req.params;
 
     console.log("BODY", req.body);
-    console.log("DATA ID", data.id);
     console.log("IDENTIFY", identify);
 
     try {
-      if (data.id) {
+      if (data) {
         const order = await knex("orders")
           .where({ identify: identify })
           .first();
