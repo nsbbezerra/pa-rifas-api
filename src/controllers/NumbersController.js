@@ -86,7 +86,6 @@ module.exports = {
         payment_methods: {
           excluded_payment_types: [{ id: "paypal" }, { id: "ticket" }],
           installments: 1,
-          s,
         },
       };
 
