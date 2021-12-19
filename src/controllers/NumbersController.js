@@ -227,7 +227,7 @@ module.exports = {
         notification_url:
           tokens.AMBIENT === "dev"
             ? tokens.WEBHOOK
-            : `${configs.url}/paymentOrder/${order.identify}`,
+            : `${configs.url}/paymentOrder/${orders.identify}`,
         items: [
           {
             title: `Compra de números PA Rifas, Rifa número: ${orders.raffle_id}`,
