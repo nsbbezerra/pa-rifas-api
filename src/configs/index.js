@@ -5,7 +5,7 @@ module.exports = {
   url: tokens.AMBIENT === "dev" ? tokens.API_DEV : tokens.API,
   site_url: tokens.AMBIENT === "dev" ? tokens.SITE_DEV : tokens.SITE,
   payment_url: tokens.MP,
-  payment_token: tokens.TEST,
+  payment_token: tokens.MP_AMBIENT === "dev" ? tokens.TEST : tokens.PRODUCTION,
   pixTax: 0.99,
   cardTax: 4.99,
   boleto: 3.49,

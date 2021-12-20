@@ -92,7 +92,10 @@ module.exports = {
       mercadopago.preferences
         .create(preference)
         .then((response) => {
-          const url = response.body.sandbox_init_point; //mudar em produção para init_point
+          const url =
+            tokens.MP_AMBIENT === "dev"
+              ? response.body.sandbox_init_point
+              : response.body.init_point;
           return res.status(201).json({
             message: "Números reservados com sucesso.",
             url,
@@ -260,7 +263,10 @@ module.exports = {
       mercadopago.preferences
         .create(preference)
         .then((response) => {
-          const url = response.body.sandbox_init_point; //mudar em produção para init_point
+          const url =
+            tokens.MP_AMBIENT === "dev"
+              ? response.body.sandbox_init_point
+              : response.body.init_point;
           return res.status(201).json({
             message: "Números reservados com sucesso.",
             url,
