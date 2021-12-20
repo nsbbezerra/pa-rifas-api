@@ -15,12 +15,6 @@ module.exports = {
     const expiration = date_fns.addHours(new Date(), 24);
 
     try {
-      const client = await knex
-        .select("*")
-        .from("clients")
-        .where({ id: client_id })
-        .first();
-
       const [order] = await knex("orders")
         .insert({
           identify: uuidv4(),
@@ -47,11 +41,13 @@ module.exports = {
       await numbers.forEach((element) => {
         SaveNumber(parseInt(element));
       });
+
       const participant = await knex
         .select("*")
         .from("participant")
         .where({ raffle_id: raffle_id, client_id: client_id })
         .first();
+
       if (!participant) {
         await knex("participant").insert({
           raffle_id: raffle_id,
@@ -59,59 +55,10 @@ module.exports = {
         });
       }
 
-      async function removeInfo() {
-        await knex("orders").where({ id: order.id }).del();
-        await knex("numbers").where({ order_id: order.id }).del();
-      }
-
-      let preference = {
-        external_reference: order.identify,
-        notification_url:
-          tokens.AMBIENT === "dev"
-            ? tokens.WEBHOOK
-            : `${configs.url}/paymentOrder/${order.identify}`,
-        items: [
-          {
-            title: `Compra de números PA Rifas, Rifa número: ${raffle_id}`,
-            unit_price: parseFloat(orderValue),
-            quantity: 1,
-          },
-        ],
-        statement_descriptor: `PA RIFAS, COMPRA Nº ${order.id}`,
-        back_urls: {
-          success: `${configs.site_url}/finalizar`,
-          failure: `${configs.site_url}/finalizar`,
-          pending: `${configs.site_url}/finalizar`,
-        },
-        auto_return: "approved",
-        payment_methods: {
-          excluded_payment_types: [{ id: "paypal" }, { id: "ticket" }],
-          installments: 1,
-        },
-      };
-
-      mercadopago.preferences
-        .create(preference)
-        .then((response) => {
-          const url =
-            tokens.MP_AMBIENT === "dev"
-              ? response.body.sandbox_init_point
-              : response.body.init_point;
-          return res.status(201).json({
-            message: "Números reservados com sucesso.",
-            url,
-          });
-        })
-        .catch((error) => {
-          removeInfo();
-          let erros = {
-            status: "400",
-            type: "Erro no login",
-            message: "Ocorreu um erro ao reservar os números",
-            err: "Erro no pagamento",
-          };
-          return res.status(400).json(erros);
-        });
+      return res.status(201).json({
+        message: "Números reservados com sucesso",
+        order,
+      });
     } catch (error) {
       let erros = {
         status: "400",
@@ -221,12 +168,6 @@ module.exports = {
         .where({ id: order })
         .first();
 
-      const client = await knex
-        .select("*")
-        .from("clients")
-        .where({ id: orders.client_id })
-        .first();
-
       let preference = {
         external_reference: orders.identify,
         notification_url:
@@ -238,6 +179,7 @@ module.exports = {
             title: `Compra de números PA Rifas, Rifa número: ${orders.raffle_id}`,
             unit_price: parseFloat(orders.value),
             quantity: 1,
+            currency_id: "BRL",
           },
         ],
         statement_descriptor: `PA RIFAS, COMPRA Nº ${orders.id}`,
