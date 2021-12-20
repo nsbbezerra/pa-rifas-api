@@ -56,16 +56,14 @@ module.exports = {
       const validate = await knex
         .select("*")
         .from("orders")
-        .where({ raffle_id: raffle.id });
+        .where({ raffle_id: raffle.id, status: "reserved" });
       async function revalidate(id) {
         await knex("orders").where({ id: id }).del();
         await knex("numbers").where({ order_id: id }).del();
       }
       await validate.forEach((element) => {
         if (date_fns.isBefore(new Date(element.expiration_date), new Date())) {
-          if (element.status === "reserved") {
-            revalidate(element.id);
-          }
+          revalidate(element.id);
         }
       });
 

@@ -78,10 +78,6 @@ module.exports = {
           },
         ],
         statement_descriptor: `PA RIFAS, COMPRA Nº ${order.id}`,
-        payer: {
-          email: client.email,
-          first_name: client.name,
-        },
         back_urls: {
           success: `${configs.site_url}/finalizar`,
           failure: `${configs.site_url}/finalizar`,
@@ -245,10 +241,6 @@ module.exports = {
           },
         ],
         statement_descriptor: `PA RIFAS, COMPRA Nº ${orders.id}`,
-        payer: {
-          email: client.email,
-          first_name: client.name,
-        },
         back_urls: {
           success: `${configs.site_url}/finalizar`,
           failure: `${configs.site_url}/finalizar`,
