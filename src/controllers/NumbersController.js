@@ -59,6 +59,11 @@ module.exports = {
         });
       }
 
+      async function removeInfo() {
+        await knex("orders").where({ id: order.id }).del();
+        await knex("numbers").where({ order_id: order.id }).del();
+      }
+
       let preference = {
         external_reference: order.identify,
         notification_url:
@@ -102,6 +107,7 @@ module.exports = {
           });
         })
         .catch((error) => {
+          removeInfo();
           let erros = {
             status: "400",
             type: "Erro no login",
