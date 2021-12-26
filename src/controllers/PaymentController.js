@@ -85,10 +85,11 @@ module.exports = {
             typePayment = "debit";
           }
 
-          if (pay === "ticket") {
-            const calc = parseFloat(orderAct.value) - configs.boleto;
-            valueTax = configs.boleto;
-            valueDiscounted = calc;
+          if (pay === "account_money") {
+            const calc = parseFloat(order.value) * (configs.cardTax / 100);
+            const rest = parseFloat(order.value) - calc;
+            valueTax = calc;
+            valueDiscounted = rest;
             typePayment = "ticket";
           }
 
