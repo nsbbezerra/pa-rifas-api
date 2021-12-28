@@ -5,10 +5,6 @@ module.exports = {
   async Show(req, res) {
     try {
       const configs = await knex.select("*").from("configs").first();
-      const numbers = await knex
-        .select("*")
-        .from("numbers")
-        .where({ status: "paid_out" });
       const raffles = await knex
         .select([
           "raffles.id",
@@ -29,12 +25,8 @@ module.exports = {
         .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
         .orderBy("raffles.updated_at", "desc");
-      let numbersRaffle = await raffles.map((element) => {
-        const result = numbers.filter((obj) => obj.raffle_id === element.id);
-        return { raffle_id: element.id, count: result.length };
-      });
 
-      return res.status(200).json({ configs, raffles, numbersRaffle });
+      return res.status(200).json({ configs, raffles });
     } catch (error) {
       let erros = {
         status: "400",

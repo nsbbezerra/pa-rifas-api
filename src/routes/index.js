@@ -82,6 +82,7 @@ router.put("/updateOrderById", PaymentsController.UpdateOrder);
 
 /** ORDERS */
 router.post("/payOrder/:order", OrderController.PayOrder);
+router.get("/findInformation/:id", OrderController.FindInformation);
 
 /** TROPHYS */
 router.get("/trophy/:id", TrophyController.Find);

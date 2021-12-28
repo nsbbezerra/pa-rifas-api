@@ -95,4 +95,23 @@ module.exports = {
       return res.status(400).json(erros);
     }
   },
+
+  async FindInformation(req, res) {
+    const { id } = req.params;
+
+    try {
+      const order = await knex("orders").where({ id: id }).first();
+      const numbers = await knex("numbers").where({ order_id: id });
+
+      return res.status(200).json({ order, numbers });
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro ao buscar as informações",
+        message: "Ocorreu um erro",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
 };

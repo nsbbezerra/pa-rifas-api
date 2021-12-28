@@ -273,16 +273,8 @@ module.exports = {
         .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
         .orderBy("raffles.updated_at", "desc");
-      const totalNumbers = await knex("numbers").where({
-        status: "paid_out",
-      });
-      let numbersRaffle = raffles.map((element) => {
-        const result = totalNumbers.filter(
-          (obj) => obj.raffle_id === element.id
-        );
-        return { raffle_id: element.id, count: result.length };
-      });
-      return res.status(200).json({ raffles, numbers: numbersRaffle });
+
+      return res.status(200).json({ raffles });
     } catch (error) {
       let erros = {
         status: "400",
