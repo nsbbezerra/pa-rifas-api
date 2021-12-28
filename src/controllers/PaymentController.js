@@ -139,4 +139,51 @@ module.exports = {
       return res.status(400).json(erros);
     }
   },
+
+  async FindOrderById(req, res) {
+    const { id } = req.params;
+
+    try {
+      const order = await knex
+        .select("*")
+        .from("orders")
+        .where({ transaction_id: id })
+        .first();
+      const numbers = await knex
+        .select("*")
+        .from("numbers")
+        .where({ order_id: order.id });
+
+      return res.status(200).json({ order, numbers });
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no pagamento",
+        message: "Ocorreu um erro",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
+  async UpdateOrder(req, res) {
+    const { payment, order } = req.body;
+
+    try {
+      await knex("orders").where({ id: order }).update({ status: payment });
+      await knex("numbers").where({ order_id: id }).update({ status: payment });
+
+      return res
+        .status(200)
+        .json({ message: "Alteração concluída com sucesso" });
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no pagamento",
+        message: "Ocorreu um erro",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
 };

@@ -77,6 +77,8 @@ router.delete("/raffleDelete/:id", RaffleEditController.RemoveRaffle);
 /** PAYMENTS */
 router.post("/rafflepayment/:id", PaymentsController.PayRaffle);
 router.post("/rafflePaymentById/:order", NumbersController.PayOrderById);
+router.get("/paymentById/:id", PaymentsController.FindOrderById);
+router.put("/updateOrderById", PaymentsController.UpdateOrder);
 
 /** ORDERS */
 router.post("/payOrder/:order", OrderController.PayOrder);
