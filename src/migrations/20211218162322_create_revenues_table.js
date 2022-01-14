@@ -1,11 +1,7 @@
 exports.up = function (knex) {
   return knex.schema.createTable("revenues", function (table) {
     table.increments("id");
-    table
-      .integer("raffle_id")
-      .references("raffles.id")
-      .notNullable()
-      .onDelete("CASCADE");
+    table.string("raffle_title");
     table.decimal("value", 8, 2);
     table.string("month");
     table.string("year");

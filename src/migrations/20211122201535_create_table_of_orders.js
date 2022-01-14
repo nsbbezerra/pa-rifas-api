@@ -16,11 +16,10 @@ exports.up = function (knex) {
       .enu("status", ["free", "reserved", "paid_out"])
       .notNullable()
       .defaultTo("reserved");
-    table.enu("pay_mode", ["pix", "card", "ticket", "debit"]);
+    table.string("pay_mode_method");
+    table.string("pay_mode_id");
     table.string("transaction_id");
-    table.decimal("tax", 8, 2);
     table.decimal("value", 8, 2);
-    table.decimal("discounted_value", 8, 2);
     table.string("expiration_date").notNullable();
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("updated_at").defaultTo(knex.fn.now());

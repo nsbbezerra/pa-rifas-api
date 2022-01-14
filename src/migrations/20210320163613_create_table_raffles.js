@@ -5,7 +5,6 @@ exports.up = function (knex) {
     table.string("name").notNullable();
     table.integer("qtd_numbers").notNullable();
     table.string("draw_date").notNullable();
-    table.string("draw_time").notNullable();
     table.integer("goal");
     table
       .integer("client_id")
@@ -13,17 +12,14 @@ exports.up = function (knex) {
       .notNullable()
       .onDelete("CASCADE");
     table.decimal("raffle_value", 8, 2);
-    table.text("description").notNullable();
+    table.text("description");
     table.text("justify");
-    table.text("change_justify");
     table
       .enu("status", ["open", "cancel", "drawn", "waiting", "refused"])
       .notNullable()
       .defaultTo("waiting");
-    table.enu("money", ["lock", "unlock"]).notNullable().defaultTo("lock");
     table.decimal("tax_value", 8, 2);
     table.string("thumbnail");
-    table.string("coupon_identify");
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("updated_at").defaultTo(knex.fn.now());
   });

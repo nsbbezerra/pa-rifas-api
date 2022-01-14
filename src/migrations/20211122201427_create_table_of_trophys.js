@@ -9,9 +9,10 @@ exports.up = function (knex) {
     table.string("title");
     table.string("description");
     table.string("number");
-    table.json("name_client");
-    table.string("client_identify");
-    table.json("address");
+    table.string("client_name");
+    table.string("client_cpf");
+    table.string("client_phone");
+    table.string("client_email");
     table
       .enu("status", ["waiting", "drawn"])
       .notNullable()
